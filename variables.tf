@@ -1,30 +1,184 @@
-variable "tpl_local_name" {
-  type        = any
-  default     = {}
-  description = "Resource definition, default settings are defined within locals and merged with var settings. For more information look at [Outputs](#Outputs)."
+// variables.tf
+
+
+variable "project_name" {
+  description = "Name of the project"
+  type        = string
 }
 
-locals {
-  default = {
-    // resource definition
-    tpl_local_name = {
-      name = ""
-      tags = {}
-    }
-  }
+variable "environment" {
+  description = "Environment (e.g., prod, dev, test)"
+  type        = string
+}
 
-  // compare and merge custom and default values
-  tpl_local_name_values = {
-    for tpl_local_name in keys(var.tpl_local_name) :
-    tpl_local_name => merge(local.default.tpl_local_name, var.tpl_local_name[tpl_local_name])
-  }
+variable "name_prefix" {
+  description = "Prefix for resource names (if not provided, will use project-environment pattern)"
+  type        = string
+  default     = ""
+}
 
-  // deep merge of all custom and default values
-  tpl_local_name = {
-    for tpl_local_name in keys(var.tpl_local_name) :
-    tpl_local_name => merge(
-      local.tpl_local_name_values[tpl_local_name],
-      {}
-    )
-  }
+
+variable "tags" {
+  description = "Additional tags for all resources"
+  type        = map(string)
+  default     = {}
+}
+
+variable "vpc_id" {
+  description = "VPC ID where the ALB will be created"
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "List of subnet IDs for the ALB"
+  type        = list(string)
+}
+
+variable "security_group_ids" {
+  description = "List of security group IDs for the ALB"
+  type        = list(string)
+}
+
+variable "certificate_arn" {
+  description = "ARN of the SSL certificate for HTTPS listener"
+  type        = string
+}
+
+variable "internal" {
+  description = "Whether the ALB is internal (true) or internet-facing (false)"
+  type        = bool
+  default     = false
+}
+
+variable "enable_deletion_protection" {
+  description = "Enable deletion protection for the ALB"
+  type        = bool
+  default     = true
+}
+
+variable "enable_cross_zone_load_balancing" {
+  description = "Enable cross-zone load balancing"
+  type        = bool
+  default     = true
+}
+
+variable "enable_http2" {
+  description = "Enable HTTP/2 support"
+  type        = bool
+  default     = true
+}
+
+variable "ssl_policy" {
+  description = "SSL policy for HTTPS listener"
+  type        = string
+  default     = "ELBSecurityPolicy-TLS-1-2-2017-01"
+}
+
+variable "create_http_listener" {
+  description = "Create HTTP listener that redirects to HTTPS"
+  type        = bool
+  default     = true
+}
+
+variable "target_port" {
+  description = "Port for the default target group"
+  type        = number
+  default     = 80
+}
+
+variable "target_protocol" {
+  description = "Protocol for the default target group"
+  type        = string
+  default     = "HTTP"
+}
+
+variable "health_check_healthy_threshold" {
+  description = "Number of consecutive health check successes required before considering a target healthy"
+  type        = number
+  default     = 3
+}
+
+variable "health_check_interval" {
+  description = "Approximate amount of time, in seconds, between health checks"
+  type        = number
+  default     = 30
+}
+
+variable "health_check_matcher" {
+  description = "Response codes to use when checking for a healthy responses from a target"
+  type        = string
+  default     = "200"
+}
+
+variable "health_check_path" {
+  description = "Destination for health checks"
+  type        = string
+  default     = "/"
+}
+
+variable "health_check_timeout" {
+  description = "Amount of time, in seconds, during which no response from a target means a failed health check"
+  type        = number
+  default     = 5
+}
+
+variable "health_check_unhealthy_threshold" {
+  description = "Number of consecutive health check failures required before considering a target unhealthy"
+  type        = number
+  default     = 2
+}
+
+variable "deregistration_delay" {
+  description = "Amount of time, in seconds, for targets to drain connections during deregistration"
+  type        = number
+  default     = 300
+}
+
+variable "additional_target_groups" {
+  description = "Additional target groups to create"
+  type = map(object({
+    port                              = number
+    protocol                          = string
+    priority                          = number
+    host_header                       = optional(string)
+    path_pattern                      = optional(string)
+    health_check_healthy_threshold    = optional(number)
+    health_check_interval             = optional(number)
+    health_check_matcher              = optional(string)
+    health_check_path                 = optional(string)
+    health_check_timeout              = optional(number)
+    health_check_unhealthy_threshold  = optional(number)
+    deregistration_delay              = optional(number)
+  }))
+  default = {}
+}
+
+variable "waf_web_acl_arn" {
+  description = "ARN of the WAF Web ACL to associate with the ALB"
+  type        = string
+  default     = ""
+}
+
+variable "enable_access_logs" {
+  description = "Enable access logs for the ALB"
+  type        = bool
+  default     = false
+}
+
+variable "create_logs_bucket" {
+  description = "Create S3 bucket for ALB access logs"
+  type        = bool
+  default     = false
+}
+
+variable "access_logs_bucket" {
+  description = "S3 bucket name for ALB access logs (required if enable_access_logs=true and create_logs_bucket=false)"
+  type        = string
+  default     = ""
+}
+
+variable "access_logs_prefix" {
+  description = "S3 prefix for ALB access logs"
+  type        = string
+  default     = "alb-access-logs"
 }
