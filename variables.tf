@@ -137,18 +137,18 @@ variable "deregistration_delay" {
 variable "additional_target_groups" {
   description = "Additional target groups to create"
   type = map(object({
-    port                              = number
-    protocol                          = string
-    priority                          = number
-    host_header                       = optional(string)
-    path_pattern                      = optional(string)
-    health_check_healthy_threshold    = optional(number)
-    health_check_interval             = optional(number)
-    health_check_matcher              = optional(string)
-    health_check_path                 = optional(string)
-    health_check_timeout              = optional(number)
-    health_check_unhealthy_threshold  = optional(number)
-    deregistration_delay              = optional(number)
+    port                             = number
+    protocol                         = string
+    priority                         = number
+    host_header                      = optional(string)
+    path_pattern                     = optional(string)
+    health_check_healthy_threshold   = optional(number)
+    health_check_interval            = optional(number)
+    health_check_matcher             = optional(string)
+    health_check_path                = optional(string)
+    health_check_timeout             = optional(number)
+    health_check_unhealthy_threshold = optional(number)
+    deregistration_delay             = optional(number)
   }))
   default = {}
 }

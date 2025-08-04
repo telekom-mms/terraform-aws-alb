@@ -7,8 +7,8 @@ resource "aws_s3_bucket" "alb_logs" {
   bucket = "${local.name_prefix}-alb-access-logs"
 
   tags = merge(local.common_tags, {
-    "Name" = "${local.name_prefix}-alb-access-logs"
-    "Purpose" = "ALB Access Logs"
+    "Name"          = "${local.name_prefix}-alb-access-logs"
+    "Purpose"       = "ALB Access Logs"
     "PSA-Compliant" = "true"
   })
 }
@@ -87,8 +87,8 @@ resource "aws_lb" "this" {
   enable_deletion_protection       = var.enable_deletion_protection
   enable_cross_zone_load_balancing = var.enable_cross_zone_load_balancing
   enable_http2                     = var.enable_http2
-  enable_waf_fail_open            = false  # PSA compliance - fail closed
-  drop_invalid_header_fields      = true   # PSA compliance - drop invalid headers
+  enable_waf_fail_open             = false # PSA compliance - fail closed
+  drop_invalid_header_fields       = true  # PSA compliance - drop invalid headers
 
   dynamic "access_logs" {
     for_each = var.enable_access_logs ? [1] : []
@@ -100,7 +100,7 @@ resource "aws_lb" "this" {
   }
 
   tags = merge(local.common_tags, {
-    "Name" = "${local.name_prefix}-alb"
+    "Name"          = "${local.name_prefix}-alb"
     "PSA-Compliant" = "true"
   })
 }
@@ -128,7 +128,7 @@ resource "aws_lb_target_group" "default" {
   deregistration_delay = var.deregistration_delay
 
   tags = merge(local.common_tags, {
-    "Name" = "${local.name_prefix}-tg-default"
+    "Name"          = "${local.name_prefix}-tg-default"
     "PSA-Compliant" = "true"
   })
 }
@@ -147,7 +147,7 @@ resource "aws_lb_listener" "https" {
   }
 
   tags = merge(local.common_tags, {
-    "Name" = "${local.name_prefix}-listener-https"
+    "Name"          = "${local.name_prefix}-listener-https"
     "PSA-Compliant" = "true"
   })
 }
@@ -170,7 +170,7 @@ resource "aws_lb_listener" "http_redirect" {
   }
 
   tags = merge(local.common_tags, {
-    "Name" = "${local.name_prefix}-listener-http-redirect"
+    "Name"          = "${local.name_prefix}-listener-http-redirect"
     "PSA-Compliant" = "true"
   })
 }
@@ -199,7 +199,7 @@ resource "aws_lb_target_group" "additional" {
   deregistration_delay = lookup(each.value, "deregistration_delay", var.deregistration_delay)
 
   tags = merge(local.common_tags, {
-    "Name" = "${local.name_prefix}-tg-${each.key}"
+    "Name"          = "${local.name_prefix}-tg-${each.key}"
     "PSA-Compliant" = "true"
   })
 }
@@ -235,7 +235,7 @@ resource "aws_lb_listener_rule" "additional" {
   }
 
   tags = merge(local.common_tags, {
-    "Name" = "${local.name_prefix}-rule-${each.key}"
+    "Name"          = "${local.name_prefix}-rule-${each.key}"
     "PSA-Compliant" = "true"
   })
 }

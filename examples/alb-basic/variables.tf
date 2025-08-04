@@ -10,7 +10,7 @@ variable "certificate_arn" {
   description = "ARN of the SSL certificate for HTTPS listener"
   type        = string
   # You need to provide a valid certificate ARN
-  default     = "arn:aws:acm:eu-central-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+  default = "arn:aws:acm:eu-central-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
 }
 
 variable "internal" {
@@ -118,18 +118,18 @@ variable "access_logs_prefix" {
 variable "additional_target_groups" {
   description = "Additional target groups"
   type = map(object({
-    port                              = number
-    protocol                          = string
-    priority                          = number
-    host_header                       = optional(string)
-    path_pattern                      = optional(string)
-    health_check_healthy_threshold    = optional(number)
-    health_check_interval             = optional(number)
-    health_check_matcher              = optional(string)
-    health_check_path                 = optional(string)
-    health_check_timeout              = optional(number)
-    health_check_unhealthy_threshold  = optional(number)
-    deregistration_delay              = optional(number)
+    port                             = number
+    protocol                         = string
+    priority                         = number
+    host_header                      = optional(string)
+    path_pattern                     = optional(string)
+    health_check_healthy_threshold   = optional(number)
+    health_check_interval            = optional(number)
+    health_check_matcher             = optional(string)
+    health_check_path                = optional(string)
+    health_check_timeout             = optional(number)
+    health_check_unhealthy_threshold = optional(number)
+    deregistration_delay             = optional(number)
   }))
   default = {
     api = {
@@ -150,7 +150,7 @@ variable "waf_web_acl_arn" {
 variable "tags" {
   description = "Tags for all resources"
   type        = map(string)
-  default     = {
+  default = {
     Environment = "dev"
     Owner       = "terraform"
     Project     = "alb-example"
