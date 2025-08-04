@@ -21,7 +21,7 @@ resource "aws_s3_bucket_versioning" "alb_logs" {
   }
 }
 
-resource "aws_s3_bucket_encryption" "alb_logs" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "alb_logs" {
   count  = var.enable_access_logs && var.create_logs_bucket ? 1 : 0
   bucket = aws_s3_bucket.alb_logs[0].id
 
