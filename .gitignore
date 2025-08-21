@@ -1,0 +1,47 @@
+# Terraform
+.terraform*
+.terraformrc
+.terragrc
+
+# Environment files
+.env
+.env.*
+
+# Logs
+*.log
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+
+# MacOS files
+.DS_Store
+
+# Windows files
+Thumbs.db
+Desktop.ini
+
+# Terraform plan and state files
+*.tfstate
+*.tfstate.*
+
+# Terraform cache
+.cache/
+
+# Example state files
+examples/*.tfstate
+examples/*.tfstate.*
+
+# Test state files
+test-defaults/*.tfstate
+test-defaults/*.tfstate.*
+tests/*.tfstate
+tests/*.tfstate.*
+
+# Terraform provider binaries
+providers/
