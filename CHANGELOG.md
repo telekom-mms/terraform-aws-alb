@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.0.1](https://github.com/telekom-mms/terraform-aws-alb/tree/0.0.1) (2025-08-07)
+## [0.0.1](https://github.com/telekom-mms/terraform-aws-alb/tree/0.0.1) (2025-08-21)
 
 [Full Changelog](https://github.com/telekom-mms/terraform-aws-alb/compare/16b6b35ab7d6174de965eb9f9f66e86ca71622d9...0.0.1)
 
