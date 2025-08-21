@@ -15,7 +15,7 @@ This example demonstrates how to use the AWS ALB module to create an Application
 
 1. Copy this example to your project
 2. Update `variables.tf` with your specific values, especially:
-   - `certificate_arn`: Your SSL certificate ARN
+   - `certificate_arn`: Your SSL certificate ARN (REPLACE WITH YOUR ACTUAL CERTIFICATE ARN)
    - `ec2_instance_ids`: Your EC2 instance IDs (if monitoring EC2)
    - `sns_email_endpoints`: Your notification email addresses
 

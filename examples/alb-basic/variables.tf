@@ -10,7 +10,8 @@ variable "certificate_arn" {
   description = "ARN of the SSL certificate for HTTPS listener"
   type        = string
   # You need to provide a valid certificate ARN
-  default = "arn:aws:acm:eu-central-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+  # Remove the default value to prevent accidental use of hardcoded sensitive information
+  # default = "arn:aws:acm:eu-central-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
 }
 
 variable "internal" {

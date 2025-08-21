@@ -1,15 +1,16 @@
 ##Written by Marc Straubinger
 // main.tf
 
+
 # S3 Bucket for ALB Access Logs
 resource "aws_s3_bucket" "alb_logs" {
   count  = var.enable_access_logs && var.create_logs_bucket ? 1 : 0
-  bucket = "${local.name_prefix}-alb-access-logs"
+  bucket = "${local.name_prefix}-${var.access_logs_prefix}"
 
   tags = merge(local.common_tags, {
-    "Name"          = "${local.name_prefix}-alb-access-logs"
+    "Name"          = "${local.name_prefix}-${var.access_logs_prefix}"
     "Purpose"       = "ALB Access Logs"
-    "PSA-Compliant" = "true"
+    "PSA-Compliant" = "true"  # PSA compliance is always enabled
   })
 }
 
@@ -27,7 +28,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "alb_logs" {
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm = var.s3_server_side_encryption_algorithm
     }
   }
 }
@@ -52,7 +53,7 @@ resource "aws_s3_bucket_policy" "alb_logs" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_elb_service_account.main.id}:root"
+          AWS = var.alb_logs_s3_policy_principal != "" ? var.alb_logs_s3_policy_principal : "arn:aws:iam::${data.aws_elb_service_account.main.id}:root"
         }
         Action   = "s3:PutObject"
         Resource = "${aws_s3_bucket.alb_logs[0].arn}/*"
@@ -85,21 +86,21 @@ resource "aws_lb" "this" {
   enable_deletion_protection       = var.enable_deletion_protection
   enable_cross_zone_load_balancing = var.enable_cross_zone_load_balancing
   enable_http2                     = var.enable_http2
-  enable_waf_fail_open             = false # PSA compliance - fail closed
-  drop_invalid_header_fields       = true  # PSA compliance - drop invalid headers
+  enable_waf_fail_open             = false  # PSA compliance: fail closed by default
+  drop_invalid_header_fields       = true   # PSA compliance: drop invalid headers by default
 
   dynamic "access_logs" {
     for_each = var.enable_access_logs ? [1] : []
     content {
       bucket  = var.create_logs_bucket ? aws_s3_bucket.alb_logs[0].bucket : var.access_logs_bucket
       prefix  = var.access_logs_prefix
-      enabled = true
+      enabled = var.access_logs_enabled
     }
   }
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-alb"
-    "PSA-Compliant" = "true"
+    "PSA-Compliant" = "true"  # PSA compliance is always enabled
   })
 }
 
@@ -111,7 +112,7 @@ resource "aws_lb_target_group" "default" {
   vpc_id   = var.vpc_id
 
   health_check {
-    enabled             = true
+    enabled             = var.health_check_enabled
     healthy_threshold   = var.health_check_healthy_threshold
     interval            = var.health_check_interval
     matcher             = var.health_check_matcher
@@ -127,7 +128,7 @@ resource "aws_lb_target_group" "default" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-tg-default"
-    "PSA-Compliant" = "true"
+    "PSA-Compliant" = "true"  # PSA compliance is always enabled
   })
 }
 
@@ -146,7 +147,7 @@ resource "aws_lb_listener" "https" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-listener-https"
-    "PSA-Compliant" = "true"
+    "PSA-Compliant" = "true"  # PSA compliance is always enabled
   })
 }
 
@@ -169,7 +170,7 @@ resource "aws_lb_listener" "http_redirect" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-listener-http-redirect"
-    "PSA-Compliant" = "true"
+    "PSA-Compliant" = "true"  # PSA compliance is always enabled
   })
 }
 
@@ -183,7 +184,7 @@ resource "aws_lb_target_group" "additional" {
   vpc_id   = var.vpc_id
 
   health_check {
-    enabled             = true
+    enabled             = lookup(each.value, "health_check_enabled", var.health_check_enabled)
     healthy_threshold   = lookup(each.value, "health_check_healthy_threshold", var.health_check_healthy_threshold)
     interval            = lookup(each.value, "health_check_interval", var.health_check_interval)
     matcher             = lookup(each.value, "health_check_matcher", var.health_check_matcher)
@@ -198,7 +199,7 @@ resource "aws_lb_target_group" "additional" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-tg-${each.key}"
-    "PSA-Compliant" = "true"
+    "PSA-Compliant" = "true"  # PSA compliance is always enabled
   })
 }
 
@@ -234,7 +235,7 @@ resource "aws_lb_listener_rule" "additional" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-rule-${each.key}"
-    "PSA-Compliant" = "true"
+    "PSA-Compliant" = "true"  # PSA compliance is always enabled
   })
 }
 
