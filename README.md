@@ -19,7 +19,7 @@
 
 <!-- PROJECT LOGO -->
 <div align="center">
-  <a href="https://github.com/MaStr79/terraform-aws-alb">
+  <a href="https://github.com/telekom-mms/terraform-aws-alb">
     <img src="logo.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -28,14 +28,14 @@
   <p align="center">
     PSA-compliant AWS ALB with HTTPS enforcement, access logging, and WAF integration
     <br />
-    <a href="https://github.com/MaStr79/terraform-aws-alb"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/telekom-mms/terraform-aws-alb"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/MaStr79/terraform-aws-alb">View Demo</a>
+    <a href="https://github.com/telekom-mms/terraform-aws-alb">View Demo</a>
     ·
-    <a href="https://github.com/MaStr79/terraform-aws-alb/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/telekom-mms/terraform-aws-alb/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
-    <a href="https://github.com/MaStr79/terraform-aws-alb/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/telekom-mms/terraform-aws-alb/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -108,7 +108,7 @@ To get a local copy up and running follow these simple example steps.
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/MaStr79/terraform-aws-alb.git
+   git clone https://github.com/telekom-mms/terraform-aws-alb.git
    ```
 2. Navigate to the module directory
    ```sh
@@ -276,19 +276,19 @@ Distributed under the Mozilla Public License Version 2.0. See `LICENSE` for more
 <!-- CONTACT -->
 ## Contact
 
-Project Link: [https://github.com/MaStr79/terraform-aws-alb](https://github.com/MaStr79/terraform-aws-alb)
+Project Link: [https://github.com/telekom-mms/terraform-aws-alb](https://github.com/telekom-mms/terraform-aws-alb)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/MaStr79/terraform-aws-alb.svg?style=for-the-badge
-[contributors-url]: https://github.com/MaStr79/terraform-aws-alb/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/MaStr79/terraform-aws-alb.svg?style=for-the-badge
-[forks-url]: https://github.com/MaStr79/terraform-aws-alb/network/members
-[stars-shield]: https://img.shields.io/github/stars/MaStr79/terraform-aws-alb.svg?style=for-the-badge
-[stars-url]: https://github.com/MaStr79/terraform-aws-alb/stargazers
-[issues-shield]: https://img.shields.io/github/issues/MaStr79/terraform-aws-alb.svg?style=for-the-badge
-[issues-url]: https://github.com/MaStr79/terraform-aws-alb/issues
-[license-shield]: https://img.shields.io/github/license/MaStr79/terraform-aws-alb.svg?style=for-the-badge
-[license-url]: https://github.com/MaStr79/terraform-aws-alb/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/telekom-mms/terraform-aws-alb.svg?style=for-the-badge
+[contributors-url]: https://github.com/telekom-mms/terraform-aws-alb/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/telekom-mms/terraform-aws-alb.svg?style=for-the-badge
+[forks-url]: https://github.com/telekom-mms/terraform-aws-alb/network/members
+[stars-shield]: https://img.shields.io/github/stars/telekom-mms/terraform-aws-alb.svg?style=for-the-badge
+[stars-url]: https://github.com/telekom-mms/terraform-aws-alb/stargazers
+[issues-shield]: https://img.shields.io/github/issues/telekom-mms/terraform-aws-alb.svg?style=for-the-badge
+[issues-url]: https://github.com/telekom-mms/terraform-aws-alb/issues
+[license-shield]: https://img.shields.io/github/license/telekom-mms/terraform-aws-alb.svg?style=for-the-badge
+[license-url]: https://github.com/telekom-mms/terraform-aws-alb/blob/master/LICENSE.txt
