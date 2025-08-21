@@ -189,11 +189,6 @@ variable "access_logs_prefix" {
   default     = "alb-access-logs"
 }
 
-variable "env_file" {
-  description = "Path to the environment file to load (e.g., 'env/env-prod.tfvars'). If not provided, no environment file will be loaded."
-  type        = string
-  default     = ""
-}
 
 variable "aws_region" {
   description = "AWS region where resources will be created"
