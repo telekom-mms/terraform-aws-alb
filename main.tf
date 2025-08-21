@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "alb_logs" {
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-${var.access_logs_prefix}"
     "Purpose"       = "ALB Access Logs"
-    "PSA-Compliant" = "true"  # PSA compliance is always enabled
+    "PSA-Compliant" = "true" # PSA compliance is always enabled
   })
 }
 
@@ -86,8 +86,8 @@ resource "aws_lb" "this" {
   enable_deletion_protection       = var.enable_deletion_protection
   enable_cross_zone_load_balancing = var.enable_cross_zone_load_balancing
   enable_http2                     = var.enable_http2
-  enable_waf_fail_open             = false  # PSA compliance: fail closed by default
-  drop_invalid_header_fields       = true   # PSA compliance: drop invalid headers by default
+  enable_waf_fail_open             = false # PSA compliance: fail closed by default
+  drop_invalid_header_fields       = true  # PSA compliance: drop invalid headers by default
 
   dynamic "access_logs" {
     for_each = var.enable_access_logs ? [1] : []
@@ -100,7 +100,7 @@ resource "aws_lb" "this" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-alb"
-    "PSA-Compliant" = "true"  # PSA compliance is always enabled
+    "PSA-Compliant" = "true" # PSA compliance is always enabled
   })
 }
 
@@ -128,7 +128,7 @@ resource "aws_lb_target_group" "default" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-tg-default"
-    "PSA-Compliant" = "true"  # PSA compliance is always enabled
+    "PSA-Compliant" = "true" # PSA compliance is always enabled
   })
 }
 
@@ -147,7 +147,7 @@ resource "aws_lb_listener" "https" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-listener-https"
-    "PSA-Compliant" = "true"  # PSA compliance is always enabled
+    "PSA-Compliant" = "true" # PSA compliance is always enabled
   })
 }
 
@@ -170,7 +170,7 @@ resource "aws_lb_listener" "http_redirect" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-listener-http-redirect"
-    "PSA-Compliant" = "true"  # PSA compliance is always enabled
+    "PSA-Compliant" = "true" # PSA compliance is always enabled
   })
 }
 
@@ -199,7 +199,7 @@ resource "aws_lb_target_group" "additional" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-tg-${each.key}"
-    "PSA-Compliant" = "true"  # PSA compliance is always enabled
+    "PSA-Compliant" = "true" # PSA compliance is always enabled
   })
 }
 
@@ -235,7 +235,7 @@ resource "aws_lb_listener_rule" "additional" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-rule-${each.key}"
-    "PSA-Compliant" = "true"  # PSA compliance is always enabled
+    "PSA-Compliant" = "true" # PSA compliance is always enabled
   })
 }
 

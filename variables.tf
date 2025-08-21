@@ -29,25 +29,25 @@ variable "tags" {
 variable "vpc_id" {
   description = "VPC ID where the ALB will be created"
   type        = string
-  default     = "vpc-12345678"  # Demo VPC ID
+  default     = "vpc-12345678" # Demo VPC ID
 }
 
 variable "subnet_ids" {
   description = "List of subnet IDs for the ALB"
   type        = list(string)
-  default     = ["subnet-12345678", "subnet-87654321"]  # Demo subnet IDs
+  default     = ["subnet-12345678", "subnet-87654321"] # Demo subnet IDs
 }
 
 variable "security_group_ids" {
   description = "List of security group IDs for the ALB"
   type        = list(string)
-  default     = ["sg-12345678"]  # Demo security group ID
+  default     = ["sg-12345678"] # Demo security group ID
 }
 
 variable "certificate_arn" {
   description = "ARN of the SSL certificate for HTTPS listener"
   type        = string
-  default     = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"  # Demo certificate ARN
+  default     = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012" # Demo certificate ARN
 }
 
 variable "internal" {
