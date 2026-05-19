@@ -1,0 +1,122 @@
+// variables.tf
+
+variable "project_name" {
+  description = "Name of the project"
+  type        = string
+  default     = "demo-app"
+}
+
+variable "environment" {
+  description = "Environment (e.g., prod, dev, test)"
+  type        = string
+  default     = "test"
+}
+
+variable "name_prefix" {
+  description = "Prefix for resource names (if not provided, will use project-environment pattern)"
+  type        = string
+  default     = ""
+}
+
+
+variable "tags" {
+  description = "Additional tags for all resources"
+  type        = map(string)
+  default     = {}
+}
+
+variable "vpc_id" {
+  description = "VPC ID where the ALB will be created"
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "List of subnet IDs for the ALB"
+  type        = list(string)
+}
+
+variable "security_group_ids" {
+  description = "List of security group IDs for the ALB"
+  type        = list(string)
+}
+
+variable "certificate_arn" {`n  description = "ARN of the SSL certificate for HTTPS listener"`n  type        = string
+  }))
+  default = {}
+}
+
+variable "waf_web_acl_arn" {
+  description = "ARN of the WAF Web ACL to associate with the ALB"
+  type        = string
+  default     = ""
+}
+
+variable "enable_access_logs" {
+  description = "Enable access logs for the ALB"
+  type        = bool
+  default     = true # Best practice: enable logging by default
+}
+
+variable "create_logs_bucket" {
+  description = "Create S3 bucket for ALB access logs"
+  type        = bool
+  default     = true # Secure-by-default: create bucket if logging enabled
+}
+
+variable "access_logs_bucket" {
+  description = "S3 bucket name for ALB access logs (required if enable_access_logs=true and create_logs_bucket=false)"
+  type        = string
+  default     = ""
+}
+
+variable "access_logs_prefix" {
+  description = "S3 prefix for ALB access logs"
+  type        = string
+  default     = "alb-access-logs"
+}
+
+variable "s3_kms_key_arn" {
+  description = "ARN of the KMS key for S3 bucket encryption (if empty, uses S3 managed keys)"
+  type        = string
+  default     = ""
+}
+
+variable "aws_region" {
+  description = "AWS region where resources will be created"
+  type        = string
+}
+
+variable "s3_server_side_encryption_algorithm" {
+  description = "Server-side encryption algorithm for S3 bucket"
+  type        = string
+  default     = "AES256"
+}
+
+variable "alb_logs_s3_policy_principal" {
+  description = "IAM principal for S3 bucket policy (default is ELB service account)"
+  type        = string
+  default     = ""
+}
+
+variable "access_logs_enabled" {
+  description = "Enable access logs for the ALB"
+  type        = bool
+  default     = true
+}
+
+variable "health_check_enabled" {
+  description = "Enable health checks for target groups"
+  type        = bool
+  default     = true
+}
+
+variable "preserve_host_header" {
+  description = "Indicates whether the Host header should be preserved and forwarded to targets"
+  type        = bool
+  default     = false
+}
+
+
+
+
+

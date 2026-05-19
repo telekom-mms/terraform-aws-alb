@@ -1,6 +1,5 @@
 // variables.tf
 
-
 variable "project_name" {
   description = "Name of the project"
   type        = string
@@ -29,134 +28,22 @@ variable "tags" {
 variable "vpc_id" {
   description = "VPC ID where the ALB will be created"
   type        = string
-  default     = "vpc-12345678" # Demo VPC ID
 }
 
 variable "subnet_ids" {
   description = "List of subnet IDs for the ALB"
   type        = list(string)
-  default     = ["subnet-12345678", "subnet-87654321"] # Demo subnet IDs
 }
 
 variable "security_group_ids" {
   description = "List of security group IDs for the ALB"
   type        = list(string)
-  default     = ["sg-12345678"] # Demo security group ID
 }
 
 variable "certificate_arn" {
   description = "ARN of the SSL certificate for HTTPS listener"
   type        = string
-  default     = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012" # Demo certificate ARN
-}
-
-variable "internal" {
-  description = "Whether the ALB is internal (true) or internet-facing (false)"
-  type        = bool
-  default     = false
-}
-
-variable "enable_deletion_protection" {
-  description = "Enable deletion protection for the ALB"
-  type        = bool
-  default     = true
-}
-
-variable "enable_cross_zone_load_balancing" {
-  description = "Enable cross-zone load balancing"
-  type        = bool
-  default     = true
-}
-
-variable "enable_http2" {
-  description = "Enable HTTP/2 support"
-  type        = bool
-  default     = true
-}
-
-variable "ssl_policy" {
-  description = "SSL policy for HTTPS listener"
-  type        = string
-  default     = "ELBSecurityPolicy-TLS-1-2-2017-01"
-}
-
-variable "create_http_listener" {
-  description = "Create HTTP listener that redirects to HTTPS"
-  type        = bool
-  default     = true
-}
-
-variable "target_port" {
-  description = "Port for the default target group"
-  type        = number
-  default     = 80
-}
-
-variable "target_protocol" {
-  description = "Protocol for the default target group"
-  type        = string
-  default     = "HTTP"
-}
-
-variable "health_check_healthy_threshold" {
-  description = "Number of consecutive health check successes required before considering a target healthy"
-  type        = number
-  default     = 3
-}
-
-variable "health_check_interval" {
-  description = "Approximate amount of time, in seconds, between health checks"
-  type        = number
-  default     = 30
-}
-
-variable "health_check_matcher" {
-  description = "Response codes to use when checking for a healthy responses from a target"
-  type        = string
-  default     = "200"
-}
-
-variable "health_check_path" {
-  description = "Destination for health checks"
-  type        = string
-  default     = "/"
-}
-
-variable "health_check_timeout" {
-  description = "Amount of time, in seconds, during which no response from a target means a failed health check"
-  type        = number
-  default     = 5
-}
-
-variable "health_check_unhealthy_threshold" {
-  description = "Number of consecutive health check failures required before considering a target unhealthy"
-  type        = number
-  default     = 2
-}
-
-variable "deregistration_delay" {
-  description = "Amount of time, in seconds, for targets to drain connections during deregistration"
-  type        = number
-  default     = 300
-}
-
-variable "additional_target_groups" {
-  description = "Additional target groups to create"
-  type = map(object({
-    port                             = number
-    protocol                         = string
-    priority                         = number
-    host_header                      = optional(string)
-    path_pattern                     = optional(string)
-    health_check_healthy_threshold   = optional(number)
-    health_check_interval            = optional(number)
-    health_check_matcher             = optional(string)
-    health_check_path                = optional(string)
-    health_check_timeout             = optional(number)
-    health_check_unhealthy_threshold = optional(number)
-    deregistration_delay             = optional(number)
-  }))
-  default = {}
+  default     = ""
 }
 
 variable "waf_web_acl_arn" {
@@ -168,13 +55,13 @@ variable "waf_web_acl_arn" {
 variable "enable_access_logs" {
   description = "Enable access logs for the ALB"
   type        = bool
-  default     = false
+  default     = true # Best practice: enable logging by default
 }
 
 variable "create_logs_bucket" {
   description = "Create S3 bucket for ALB access logs"
   type        = bool
-  default     = false
+  default     = true # Secure-by-default: create bucket if logging enabled
 }
 
 variable "access_logs_bucket" {
@@ -189,11 +76,15 @@ variable "access_logs_prefix" {
   default     = "alb-access-logs"
 }
 
+variable "s3_kms_key_arn" {
+  description = "ARN of the KMS key for S3 bucket encryption (if empty, uses S3 managed keys)"
+  type        = string
+  default     = ""
+}
 
 variable "aws_region" {
   description = "AWS region where resources will be created"
   type        = string
-  default     = "us-east-1"
 }
 
 variable "s3_server_side_encryption_algorithm" {
@@ -208,7 +99,6 @@ variable "alb_logs_s3_policy_principal" {
   default     = ""
 }
 
-
 variable "access_logs_enabled" {
   description = "Enable access logs for the ALB"
   type        = bool
@@ -219,4 +109,141 @@ variable "health_check_enabled" {
   description = "Enable health checks for target groups"
   type        = bool
   default     = true
+}
+
+variable "internal" {
+  description = "Whether the ALB should be internal"
+  type        = bool
+  default     = false
+}
+
+variable "idle_timeout" {
+  description = "The time in seconds that the connection is allowed to be idle"
+  type        = number
+  default     = 60
+}
+
+variable "enable_deletion_protection" {
+  description = "Whether to enable deletion protection"
+  type        = bool
+  default     = true
+}
+
+variable "enable_cross_zone_load_balancing" {
+  description = "Whether to enable cross-zone load balancing"
+  type        = bool
+  default     = false
+}
+
+variable "enable_http2" {
+  description = "Whether to enable HTTP/2"
+  type        = bool
+  default     = true
+}
+
+variable "drop_invalid_header_fields" {
+  description = "Whether to drop invalid HTTP header fields"
+  type        = bool
+  default     = true
+}
+
+variable "desync_mitigation_mode" {
+  description = "Determines how the load balancer mitigates desync attacks"
+  type        = string
+  default     = "defensive"
+}
+
+variable "preserve_host_header" {
+  description = "Indicates whether the Host header should be preserved and forwarded to targets"
+  type        = bool
+  default     = false
+}
+
+variable "target_port" {
+  description = "The port on which targets receive traffic"
+  type        = number
+  default     = 80
+}
+
+variable "target_protocol" {
+  description = "The protocol to use for routing traffic to targets"
+  type        = string
+  default     = "HTTP"
+}
+
+variable "health_check_healthy_threshold" {
+  description = "The number of consecutive health check successes required before considering an unhealthy target healthy"
+  type        = number
+  default     = 3
+}
+
+variable "health_check_interval" {
+  description = "The approximate amount of time, in seconds, between health checks of an individual target"
+  type        = number
+  default     = 30
+}
+
+variable "health_check_matcher" {
+  description = "The HTTP codes to use when checking for a successful response from a target"
+  type        = string
+  default     = "200"
+}
+
+variable "health_check_path" {
+  description = "The destination for health checks on the targets"
+  type        = string
+  default     = "/"
+}
+
+variable "health_check_timeout" {
+  description = "The amount of time, in seconds, during which no response means a failed health check"
+  type        = number
+  default     = 5
+}
+
+variable "health_check_unhealthy_threshold" {
+  description = "The number of consecutive health check failures required before considering a target unhealthy"
+  type        = number
+  default     = 2
+}
+
+variable "deregistration_delay" {
+  description = "The amount of time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused"
+  type        = number
+  default     = 300
+}
+
+variable "ssl_policy" {
+  description = "The security policy that defines which ciphers and protocols are supported"
+  type        = string
+  default     = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+}
+
+variable "create_http_listener" {
+  description = "Whether to create an HTTP listener that redirects to HTTPS"
+  type        = bool
+  default     = true
+}
+
+variable "additional_target_groups" {
+  description = "Additional target groups to create"
+  type = map(object({
+    port     = number
+    protocol = string
+    # Health check settings
+    health_check_enabled             = optional(bool)
+    health_check_healthy_threshold   = optional(number)
+    health_check_interval            = optional(number)
+    health_check_matcher             = optional(string)
+    health_check_path                = optional(string)
+    health_check_timeout             = optional(number)
+    health_check_unhealthy_threshold = optional(number)
+    # Connection draining
+    deregistration_delay = optional(number)
+    # Routing
+    host_header  = optional(string)
+    path_pattern = optional(string)
+    priority     = number
+  }))
+  default = {}
 }

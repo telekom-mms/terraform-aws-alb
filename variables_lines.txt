@@ -1,0 +1,20 @@
+3:variable "project_name" {
+9:variable "environment" {
+15:variable "name_prefix" {
+22:variable "tags" {
+28:variable "vpc_id" {
+33:variable "subnet_ids" {
+38:variable "security_group_ids" {
+43:variable "certificate_arn" {`n  description = "ARN of the SSL certificate for HTTPS listener"`n  type        = string
+48:variable "waf_web_acl_arn" {
+54:variable "enable_access_logs" {
+60:variable "create_logs_bucket" {
+66:variable "access_logs_bucket" {
+72:variable "access_logs_prefix" {
+78:variable "s3_kms_key_arn" {
+84:variable "aws_region" {
+89:variable "s3_server_side_encryption_algorithm" {
+95:variable "alb_logs_s3_policy_principal" {
+101:variable "access_logs_enabled" {
+107:variable "health_check_enabled" {
+113:variable "preserve_host_header" {

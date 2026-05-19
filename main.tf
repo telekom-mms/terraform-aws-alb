@@ -2,15 +2,21 @@
 // main.tf
 
 
+// main.tf
+# Written by Marc Straubinger - Overhauled for Security-First Best Practices
+
 # S3 Bucket for ALB Access Logs
 resource "aws_s3_bucket" "alb_logs" {
   count  = var.enable_access_logs && var.create_logs_bucket ? 1 : 0
-  bucket = "${local.name_prefix}-${var.access_logs_prefix}"
+  bucket = var.access_logs_bucket != "" ? var.access_logs_bucket : "${local.name_prefix}-logs"
+
+  # PSA Compliance: Req 8 (Logging must be secure)
+  force_destroy = false
 
   tags = merge(local.common_tags, {
-    "Name"          = "${local.name_prefix}-${var.access_logs_prefix}"
+    "Name"          = var.access_logs_bucket != "" ? var.access_logs_bucket : "${local.name_prefix}-logs"
     "Purpose"       = "ALB Access Logs"
-    "PSA-Compliant" = "true" # PSA compliance is always enabled
+    "PSA-Compliant" = "true"
   })
 }
 
@@ -28,7 +34,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "alb_logs" {
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = var.s3_server_side_encryption_algorithm
+      kms_master_key_id = var.s3_kms_key_arn
+      sse_algorithm     = var.s3_kms_key_arn != "" ? "aws:kms" : var.s3_server_side_encryption_algorithm
     }
   }
 }
@@ -51,6 +58,7 @@ resource "aws_s3_bucket_policy" "alb_logs" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "AllowELBLogDelivery"
         Effect = "Allow"
         Principal = {
           AWS = var.alb_logs_s3_policy_principal != "" ? var.alb_logs_s3_policy_principal : "arn:aws:iam::${data.aws_elb_service_account.main.id}:root"
@@ -59,6 +67,7 @@ resource "aws_s3_bucket_policy" "alb_logs" {
         Resource = "${aws_s3_bucket.alb_logs[0].arn}/*"
       },
       {
+        Sid    = "AWSLogDeliveryWrite"
         Effect = "Allow"
         Principal = {
           Service = "delivery.logs.amazonaws.com"
@@ -70,6 +79,15 @@ resource "aws_s3_bucket_policy" "alb_logs" {
             "s3:x-amz-acl" = "bucket-owner-full-control"
           }
         }
+      },
+      {
+        Sid    = "AWSLogDeliveryAclCheck"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.alb_logs[0].arn
       }
     ]
   })
@@ -83,11 +101,16 @@ resource "aws_lb" "this" {
   security_groups    = var.security_group_ids
   subnets            = var.subnet_ids
 
+  idle_timeout                     = var.idle_timeout
   enable_deletion_protection       = var.enable_deletion_protection
   enable_cross_zone_load_balancing = var.enable_cross_zone_load_balancing
   enable_http2                     = var.enable_http2
-  enable_waf_fail_open             = false # PSA compliance: fail closed by default
-  drop_invalid_header_fields       = true  # PSA compliance: drop invalid headers by default
+
+  # PSA Compliance: security-first attributes
+  enable_waf_fail_open       = false # Fail closed
+  drop_invalid_header_fields = var.drop_invalid_header_fields
+  desync_mitigation_mode     = var.desync_mitigation_mode
+  preserve_host_header       = var.preserve_host_header
 
   dynamic "access_logs" {
     for_each = var.enable_access_logs ? [1] : []
@@ -100,7 +123,7 @@ resource "aws_lb" "this" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-alb"
-    "PSA-Compliant" = "true" # PSA compliance is always enabled
+    "PSA-Compliant" = "true"
   })
 }
 
@@ -128,7 +151,7 @@ resource "aws_lb_target_group" "default" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-tg-default"
-    "PSA-Compliant" = "true" # PSA compliance is always enabled
+    "PSA-Compliant" = "true"
   })
 }
 
@@ -147,11 +170,12 @@ resource "aws_lb_listener" "https" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-listener-https"
-    "PSA-Compliant" = "true" # PSA compliance is always enabled
+    "PSA-Compliant" = "true"
   })
 }
 
 # HTTP Listener (Redirect to HTTPS)
+# PSA Compliance: Req 21 (HTTPS by default)
 resource "aws_lb_listener" "http_redirect" {
   count             = var.create_http_listener ? 1 : 0
   load_balancer_arn = aws_lb.this.arn
@@ -170,7 +194,7 @@ resource "aws_lb_listener" "http_redirect" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-listener-http-redirect"
-    "PSA-Compliant" = "true" # PSA compliance is always enabled
+    "PSA-Compliant" = "true"
   })
 }
 
@@ -199,7 +223,7 @@ resource "aws_lb_target_group" "additional" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-tg-${each.key}"
-    "PSA-Compliant" = "true" # PSA compliance is always enabled
+    "PSA-Compliant" = "true"
   })
 }
 
@@ -235,7 +259,7 @@ resource "aws_lb_listener_rule" "additional" {
 
   tags = merge(local.common_tags, {
     "Name"          = "${local.name_prefix}-rule-${each.key}"
-    "PSA-Compliant" = "true" # PSA compliance is always enabled
+    "PSA-Compliant" = "true"
   })
 }
 

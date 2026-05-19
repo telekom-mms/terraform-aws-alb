@@ -63,6 +63,10 @@
     <li><a href="#examples">Examples</a></li>
     <li><a href="#security-features">Security Features</a></li>
     <li><a href="#target-group-support">Target Group Support</a></li>
+    <li><a href="#outputs">Outputs</a></li>
+    <li><a href="#psa-compliance-features">PSA Compliance Features</a></li>
+    <li><a href="#integration">Integration</a></li>
+    <li><a href="#troubleshooting">Troubleshooting</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -76,13 +80,15 @@ This Terraform module creates PSA-compliant AWS Application Load Balancers with 
 
 ### Features
 
-- HTTPS-first configuration with SSL/TLS termination
+- HTTPS-first configuration with SSL/TLS termination (TLS 1.3 by default)
 - Automatic HTTP to HTTPS redirection
-- S3 access logs with encryption
+- Strictest HTTP desync mitigation mode enabled by default
+- S3 access logs with KMS encryption support
 - WAF Web ACL association support
 - Multiple target groups with custom routing rules
 - Health checks with configurable parameters
 - PSA-compliant security settings
+- Invalid header field dropping enabled by default
 
 ### OpenTofu Compatibility
 
@@ -197,8 +203,183 @@ module "aws-alb" {
 module "aws-alb" {
   source = "./terraform-aws-alb"
 
-  # Required variables
+  # Basic configuration
+  name_prefix = "myapp"
+  vpc_id      = "vpc-123456"
+  subnet_ids  = ["subnet-123", "subnet-456"]
+  
+  # Security configuration
+  security_group_ids = ["sg-789"]
+  certificate_arn    = "arn:aws:acm:region:account:certificate/cert-id"
+  
+  # Multiple target groups
+  target_groups = {
+    api = {
+      port     = 8080
+      protocol = "HTTP"
+      health_check = {
+        path                = "/health"
+        healthy_threshold   = 3
+        unhealthy_threshold = 3
+        timeout            = 5
+        interval           = 30
+      }
+    }
+    web = {
+      port     = 3000
+      protocol = "HTTP"
+      health_check = {
+        path = "/ping"
+      }
+    }
+  }
+
+  # Routing rules
+  listener_rules = {
+    api = {
+      priority = 100
+      conditions = {
+        path_patterns = ["/api/*"]
+      }
+      target_group_key = "api"
+    }
+    web = {
+      priority = 200
+      conditions = {
+        path_patterns = ["/*"]
+      }
+      target_group_key = "web"
+    }
+  }
+
+  tags = {
+    "Environment" = "production"
+    "Service"     = "multi-app"
+  }
+}
+```
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| `alb_arn` | ARN of the Application Load Balancer |
+| `alb_dns_name` | DNS name of the ALB |
+| `alb_zone_id` | Hosted zone ID of the ALB |
+| `alb_id` | ID of the ALB |
+| `default_target_group_arn` | ARN of the default target group |
+| `https_listener_arn` | ARN of the HTTPS listener |
+| `http_listener_arn` | ARN of the HTTP listener (if enabled) |
+| `target_group_arns` | Map of target group ARNs by key |
+| `listener_rule_arns` | Map of listener rule ARNs by key |
+
+## PSA Compliance Features
+
+This module implements the following PSA compliance features (referencing `08-Strukturierte_PSA_Anforderungen_Webserver_LLM.pdf`):
+
+### Security Controls
+
+- **Req 11/15 (Strong Ciphers)**: Enforced via modern TLS 1.3/1.2 policies (`ELBSecurityPolicy-TLS13-1-2-2021-06`).
+- **Req 19 (Strict Inspection)**: Enabled via `drop_invalid_header_fields = true` and `desync_mitigation_mode = strictest`.
+- **Req 21 (HTTPS Default)**: Mandatory HTTPS listener with automatic HTTP redirection for all port 80 traffic.
+- **Req 8 (Secure Logging)**: S3 access logs enabled by default with versioning, encryption (KMS supported), and restricted public access.
+- **WAF integration** with fail-closed configuration for layer 7 protection.
+- **Deletion protection** enabled by default to prevent accidental resource removal.
+
+### Monitoring & Logging
+
+- CloudWatch metrics integration for ALB and Target Groups.
+- Access log retention policies via S3 lifecycle (if configured in bucket).
+- Health check monitoring for all registered targets.
+
+### Network Security
+
+- Subnet isolation support
+- Security group management
+- IP-based access control
+- Custom SSL policy support
+
+## Integration
+
+This module is designed to work seamlessly with other infrastructure components:
+
+### Related Modules
+
+- [terraform-aws-security-groups](../terraform-aws-security-groups) - Security group configurations
+- [terraform-aws-iam-roles](../terraform-aws-iam-roles) - IAM role management
+- [terraform-aws-waf](../terraform-aws-waf) - WAF ACL configuration
+- [terraform-aws-s3](../terraform-aws-s3) - Access log storage
+
+### Integration Example
+
+```hcl
+# Security Groups
+module "alb_security_groups" {
+  source = "../terraform-aws-security-groups"
+  
   vpc_id = "vpc-123456"
+  name   = "alb-security-group"
+  
+  ingress_rules = [{
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }]
+}
+
+# S3 Bucket for Access Logs
+module "alb_logs" {
+  source = "../terraform-aws-s3"
+  
+  bucket_name = "my-alb-logs"
+  versioning  = true
+  encryption  = true
+}
+
+# ALB Module
+module "alb" {
+  source = "./terraform-aws-alb"
+  
+  security_group_ids = [module.alb_security_groups.security_group_id]
+  access_logs = {
+    bucket = module.alb_logs.bucket_id
+    prefix = "alb-logs/"
+  }
+  # ... other configuration
+}
+```
+
+## Troubleshooting
+
+Common issues and their solutions:
+
+### Health Check Failures
+
+- Verify target group health check settings
+- Ensure backend services are responding on the configured path
+- Check security group rules allow health check traffic
+
+### Certificate Issues
+
+- Validate ACM certificate is in the same region as ALB
+- Ensure certificate is fully validated
+- Check domain names match certificate SAN
+
+### Performance Optimization
+
+- Enable cross-zone load balancing for better distribution
+- Configure appropriate target group deregistration delay
+- Monitor and adjust scaling policies based on CloudWatch metrics
+
+[Back to top](#readme-top)
+
+## Required Variables
+
+The following variables are required:
+
+```hcl
+vpc_id = "vpc-123456"
   subnet_ids = ["subnet-123", "subnet-456"]
   security_group_ids = ["sg-789"]
   certificate_arn = "arn:aws:acm:region:account:certificate/cert-id" # REPLACE WITH YOUR ACTUAL CERTIFICATE ARN
@@ -232,12 +413,13 @@ module "aws-alb" {
 <!-- SECURITY FEATURES -->
 ## Security Features
 
-- HTTPS enforcement with modern SSL policies
-- HTTP redirects to HTTPS (301 permanent)
-- WAF fail-closed configuration
-- Invalid header fields are dropped
-- S3 access logs with server-side encryption
-- Public access blocked on log buckets
+- **TLS 1.3 Enforcement**: Uses `ELBSecurityPolicy-TLS13-1-2-2021-06` by default for strong cipher suites and modern protocol support.
+- **Desync Mitigation**: Set to `strictest` mode to prevent HTTP desync attacks.
+- **HTTPS Redirect**: Automatic 301 redirection from port 80 to 443.
+- **Access Logging**: Enabled by default with secure S3 storage.
+- **KMS Encryption**: Support for customer-managed KMS keys for access log encryption.
+- **WAF Integration**: Fail-closed configuration to ensure security even if WAF is unavailable.
+- **Header Security**: Invalid header fields are automatically dropped.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
