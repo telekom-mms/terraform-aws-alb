@@ -41,9 +41,8 @@ variable "security_group_ids" {
 }
 
 variable "certificate_arn" {
-  description = "ARN of the SSL certificate for HTTPS listener"
+  description = "ARN of the SSL certificate for HTTPS listener (required)"
   type        = string
-  default     = ""
 }
 
 variable "waf_web_acl_arn" {

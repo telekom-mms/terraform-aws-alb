@@ -64,7 +64,12 @@ resource "aws_s3_bucket_policy" "alb_logs" {
           AWS = var.alb_logs_s3_policy_principal != "" ? var.alb_logs_s3_policy_principal : "arn:aws:iam::${data.aws_elb_service_account.main.id}:root"
         }
         Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.alb_logs[0].arn}/*"
+        Resource = "${aws_s3_bucket.alb_logs[0].arn}/${local.access_logs_resource_path}"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
       },
       {
         Sid    = "AWSLogDeliveryWrite"
@@ -73,10 +78,11 @@ resource "aws_s3_bucket_policy" "alb_logs" {
           Service = "delivery.logs.amazonaws.com"
         }
         Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.alb_logs[0].arn}/*"
+        Resource = "${aws_s3_bucket.alb_logs[0].arn}/${local.access_logs_resource_path}"
         Condition = {
           StringEquals = {
-            "s3:x-amz-acl" = "bucket-owner-full-control"
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "s3:x-amz-acl"      = "bucket-owner-full-control"
           }
         }
       },
@@ -271,4 +277,5 @@ resource "aws_wafv2_web_acl_association" "this" {
 }
 
 # Data sources
+data "aws_caller_identity" "current" {}
 data "aws_elb_service_account" "main" {}
