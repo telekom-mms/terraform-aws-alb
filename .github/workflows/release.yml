@@ -11,10 +11,10 @@ env:
 jobs:
   call-readme:
     if: github.repository != '$TEMPLATE_REPOSITORY'
-    uses: telekom-mms/.github/.github/workflows/terraform_docs.yml@main
+    uses: telekom-mms/.github/.github/workflows/terraform_docs.yml@d13a8849ede699a759dcc00015176cd4190331cf # main
   call-release:
     if: github.repository != '$TEMPLATE_REPOSITORY'
-    uses: telekom-mms/.github/.github/workflows/release.yml@main
+    uses: telekom-mms/.github/.github/workflows/release.yml@d13a8849ede699a759dcc00015176cd4190331cf # main
     secrets:
       GH_BRANCH_PROTECTION_APP_TOKEN: ${{ secrets.GH_BRANCH_PROTECTION_APP_TOKEN }}
     with:
