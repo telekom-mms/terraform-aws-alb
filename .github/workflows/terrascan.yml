@@ -11,7 +11,7 @@ env:
 jobs:
   call-terrascan:
     if: github.repository != '$TEMPLATE_REPOSITORY'
-    uses: telekom-mms/.github/.github/workflows/terrascan.yml@main
+    uses: telekom-mms/.github/.github/workflows/terrascan.yml@4c9b11997aa36fc74db64e5857d775ed66e86c9b # main
     with:
       iac_type: terraform
       iac_dir: ./tests
