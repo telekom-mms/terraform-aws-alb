@@ -13,6 +13,6 @@ env:
 jobs:
   call-settings:
     if: github.repository != '$TEMPLATE_REPOSITORY'
-    uses: telekom-mms/.github/.github/workflows/github_repository.yml@main
+    uses: telekom-mms/.github/.github/workflows/github_repository.yml@4c9b11997aa36fc74db64e5857d775ed66e86c9b # main
     secrets:
       GH_APP_CREDENTIALS_TOKEN: ${{ secrets.GH_APP_CREDENTIALS_TOKEN }}
