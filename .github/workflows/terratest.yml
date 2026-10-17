@@ -11,7 +11,7 @@ env:
 jobs:
   call-terratest:
     if: github.repository != '$TEMPLATE_REPOSITORY'
-    uses: telekom-mms/.github/.github/workflows/terratest.yml@main
+    uses: telekom-mms/.github/.github/workflows/terratest.yml@7c33098554c9aa6cd573cb3696ee59ce5d9691df # main
     with:
       test: azure
     secrets:
