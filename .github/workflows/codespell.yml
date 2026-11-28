@@ -9,4 +9,4 @@ on:
 
 jobs:
   call-codespell:
-    uses: telekom-mms/.github/.github/workflows/codespell.yml@main
+    uses: telekom-mms/.github/.github/workflows/codespell.yml@c5e48f3682cabdc65ee1f655c89989fae92bdb55 # main
